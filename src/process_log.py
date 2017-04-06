@@ -1,6 +1,7 @@
-import sys, getopt
 import parse_file
 import argparse
+
+
 
 def output_results(output_file,results):
 	"""Writes results to file"""
@@ -46,6 +47,7 @@ def feature3(input_file, output_file,time_format):
 
 
 
+
 def feature4(input_file, output_file):
 	"""Process input_file and write output to output_file
 	for requests that would be blocked based on activity
@@ -67,11 +69,11 @@ def main():
 	args = parser.parse_args()
 
 
-	time_format_naive = "%d/%b/%Y:%H:%M:%S"
+	time_format = "%d/%b/%Y:%H:%M:%S -0400"
 
 	feature1(args.input_file, args.host_output)
 	feature2(args.input_file, args.resources_output)
-	feature3(args.input_file, args.hours_output, time_format_naive)
+	feature3(args.input_file, args.hours_output, time_format)
 	feature4(args.input_file, args.blocked_output)
 	
 

@@ -1,4 +1,5 @@
 import re
+import io
 from datetime import datetime, timedelta
 import queue
 
@@ -20,12 +21,12 @@ def datetime_from_string(date_string, naive=True):
 	s = int(date_string[18:20])
 	return datetime(day=d,month=mon,year=y,hour=h,minute=mn,second=s)
            
-def feature1(input_file, encoding='ISO-8859-1'):
+def feature1(input_file):
 	"""Returns a dict of hosts and the number of times
 	they have accessed the site during the period of
 	time covered by the input file"""
 	host_dict = {}
-	with open(input_file, 'r', encoding=encoding) as f:
+	with open(input_file, 'r', errors='replace') as f:
 		for line in f:
 			host = line[:line.find(' ')]
 			if host not in host_dict:
@@ -33,13 +34,15 @@ def feature1(input_file, encoding='ISO-8859-1'):
 			host_dict[host] += 1
 	return host_dict
 
-def feature2(input_file, encoding='ISO-8859-1'):
+def feature2(input_file):
 	"""Returns a dict of resources and number of bytes
 	consumed by each during the period of time covered
 	by the input file"""
 	resource_dict = {}
-	resource_regex = re.compile(r'.*\"(.+)\"\s+\d+\s+([\d+|-])')
-	with open (input_file, 'r', encoding = encoding) as f:
+	#resource_regex = re.compile(r'.*\"(.+)\"\s+\d+\s+([\d+|-])')
+	resource_regex = re.compile(r'.*["\u201c\u201d](.+)["\u201c\u201d]\s+\d+\s+([\d+|-])')
+
+	with io.open (input_file, 'r',errors='replace') as f:
 	    for line in f:
 	        mo = resource_regex.search(line)
 	        try:
@@ -47,20 +50,18 @@ def feature2(input_file, encoding='ISO-8859-1'):
 	        except ValueError:
 	            bts = 0
 	        resource = mo.group(1)
-	        if resource not in resource_dict:
-	            
+	        if resource not in resource_dict:        
 	            resource_dict[resource] = 0
 	        resource_dict[resource] += bts
 	return resource_dict
 
 
-def feature3(input_file, encoding='ISO-8859-1'):
+def feature3(input_file):
 	"""Returns a list of timestamps converted into datetime format"""
 	timestamps = []
 	cur_timestamp_string = None
-	timestamp_regex = re.compile(r'.*\[(.*)\]\s\"')
-	with open (input_file, 'r', encoding = encoding) as f:
-	    first_line = f.readline()
+	timestamp_regex = re.compile(r'.*\[(.*)\]\s["\u201c\u201d]')
+	with open (input_file, 'r', errors='replace') as f:
 	    for line in f:
 	        mo = timestamp_regex.search(line)
 	        timestamp_string = mo.group(1)
@@ -114,8 +115,8 @@ def feature4(input_file, request='/login', blocked_mins = 5, failed_sec = 20, fa
 	blocked = {}
 	blocked_log = []
 	failed_attempt = {}
-	logfile_regex = re.compile(r'(\S+).*\[(.*)\]\s+\"(.*)\"\s+(\d+)')
-	with open (input_file, 'r', encoding = "ISO-8859-1") as f:
+	logfile_regex = re.compile(r'(\S+).*\[(.*)\]\s+["\u201c\u201d](.*)["\u201c\u201d]\s+(\d+)')
+	with open (input_file, 'r', errors='replace') as f:
 	    for line in f:
 	        mo = logfile_regex.search(line)
 	        ip, timestamp, resource, result = mo.groups()
