@@ -24,6 +24,6 @@ Detect patterns of three failed login attempts from the same IP address over 20 
 
 * My assumption is that the timezone is a constant as it is part of the server's access timestamp.  I suppose, though, that ignoring the timezone could be a problem during the change to daylight savings time (fall back).
 
-* The feature 3 implementation looks at each time period in the log and counts the number of entries that are within 60 minutes.  This creates a rolling 60 minute window over the span of the log.  I first took a different approach to this problem - grouping the timestamps into non-overlapping 60 minute periods. 
+* The feature 3 implementation looks at each time period in the log and counts the number of entries that are within 60 minutes.  This creates a rolling 60 minute window over the span of the log.  I first took a different approach to this problem - grouping the timestamps into non-overlapping 60 minute periods. I've included this code in the function `feature3_non_overlapping`.
 
 

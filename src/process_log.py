@@ -47,6 +47,22 @@ def feature4(input_file, output_file):
 	output_results(output_file, result)
 
 
+def feature3_nonoverlapping(input_file, output_file,time_format):
+	"""Process input_file and write output to output_file
+	for top 10 hours of activity"""
+	timestamps = parse_file.feature3_non_overlapping(input_file)
+
+	hours = parse_file.group_timestamps(timestamps)
+
+	sorted_hours = sorted(hours, key=lambda x: x[1],
+		reverse = True)[:10]
+
+	result = [item[0].strftime(time_format) + ',' + str(item[1]) 
+				for item in sorted_hours]
+	output_results(output_file, result)
+
+
+
 def main():
 
 	parser = argparse.ArgumentParser()
