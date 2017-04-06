@@ -3,57 +3,46 @@ import argparse
 
 
 
-def output_results(output_file,results):
+def output_results(output_file, results):
 	"""Writes results to file"""
 	with open(output_file,'w') as f:
 		for line in results:
 			print(line, file=f)
 
+def top_n(result_dict, n):
+	"""Returns a list of the top n entries in a dictionary based on 
+	the sorted values in the dictionary - or all of the sorted
+	entries if n is < the length of the dictionary"""
+	return sorted(result_dict.items(), key=lambda x: x[1],
+		reverse = True)[:n]
 
-def feature1(input_file, output_file):
+def feature1(result_dict, output_file):
 	"""Process input_file and write output to output_file
 	for top 10 hosts"""
-	host_dict = parse_file.feature1(input_file)
-	top_hosts = sorted(host_dict.items(), key=lambda x: x[1],
-		reverse = True)[:10]
-
+	top_hosts = top_n(result_dict,10)
 	result = [str(item[0] + ',' + str(item[1])) for item in top_hosts]
 	output_results(output_file, result)
 
-def feature2(input_file, output_file):
+def feature2(result_dict, output_file):
 	"""Process input_file and write output to output_file
 	for top 10 resources requested"""
-	resource_dict = parse_file.feature2(input_file)
-	top_resources = sorted(resource_dict.items(), key=lambda x: x[1],
-		reverse=True)[:10]
-
+	top_resources = top_n(result_dict,10)
 	result = [resource[0].split(' ')[1] for resource in top_resources]
 	output_results(output_file, result)
 
-
-def feature3(input_file, output_file,time_format):
+def feature3(result_dict, output_file, time_format):
 	"""Process input_file and write output to output_file
 	for top 10 hours of activity"""
-	timestamps = parse_file.feature3(input_file)
-
-	hours = parse_file.group_timestamps(timestamps)
-
-	sorted_hours = sorted(hours, key=lambda x: x[1],
-		reverse = True)[:10]
-
+	top_times = top_n(result_dict,10)
 	result = [item[0].strftime(time_format) + ',' + str(item[1]) 
-				for item in sorted_hours]
+				for item in top_times]
 	output_results(output_file, result)
-
-
-
 
 def feature4(input_file, output_file):
 	"""Process input_file and write output to output_file
 	for requests that would be blocked based on activity
 	levels over threshold"""
-	blocked_log = parse_file.feature4(input_file)
-
+	blocked_log = parse_file.failed_attempts(input_file)
 	result = [item.strip() for item in blocked_log]
 	output_results(output_file, result)
 
@@ -68,12 +57,12 @@ def main():
 	parser.add_argument("blocked_output", help="feature 4: path to blocked output file")
 	args = parser.parse_args()
 
-
 	time_format = "%d/%b/%Y:%H:%M:%S -0400"
 
-	feature1(args.input_file, args.host_output)
-	feature2(args.input_file, args.resources_output)
-	feature3(args.input_file, args.hours_output, time_format)
+	host_dict, resource_dict, time_totals_dict = parse_file.log_summary(args.input_file)
+	feature1(host_dict,args.host_output)
+	feature2(resource_dict,args.resources_output)
+	feature3(time_totals_dict,args.hours_output,time_format)
 	feature4(args.input_file, args.blocked_output)
 	
 

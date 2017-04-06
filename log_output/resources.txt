@@ -1,1 +1,10 @@
-Output for Feature 2 would go here
+/
+/images/NASA-logosmall.gif
+/images/WORLD-logosmall.gif
+/ksc.html
+/images/ksclogo-medium.gif
+/shuttle/missions/missions.html
+/images/MOSAIC-logosmall.gif
+/shuttle/countdown/
+/images/USA-logosmall.gif
+/images/ksclogosmall.gif
